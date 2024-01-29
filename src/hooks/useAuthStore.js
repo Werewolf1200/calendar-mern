@@ -7,7 +7,7 @@ export const useAuthStore = () => {
     const { status, user, errorMessage } = useSelector(state => state.auth);
     const dispatch = useDispatch();
 
-    const starLogin = async ({ email, password }) => {
+    const startLogin = async ({ email, password }) => {
         
         dispatch(onChecking());
 
@@ -27,6 +27,48 @@ export const useAuthStore = () => {
         }
     }
 
+    const startRegister = async ({ email, password, name }) => {
+        
+        dispatch(onChecking());
+
+        try {
+
+            const {data} = await calendarApi.post('/auth/new', { email, password, name });
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('token-init-date', new Date().getTime());
+
+            dispatch(onLogin({ name: data.name, uid: data.uid }));
+
+        } catch (error) {
+            dispatch(onLogout(error.response.data?.msg || ''));
+            setTimeout(() => {
+                dispatch(clearErrorMessage());
+            }, 10);
+        }
+    }
+
+    const checkAuthToken = async () => { // Se usará en AppRouter
+        const token = localStorage.getItem('token');
+        if (!token) return dispatch(onLogout());
+
+        try {
+            const { data } = await calendarApi.get('/auth/renew');
+            
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('token-init-date', new Date().getTime());
+
+            dispatch(onLogin({ name: data.name, uid: data.uid }));
+        } catch (error) {
+            localStorage.clear();
+            dispatch(onLogout());
+        }
+    }
+
+    const startLogout = () => {
+        localStorage.clear();
+        dispatch(onLogout());
+    }
+
     return {
 
         // Propiedades
@@ -35,7 +77,10 @@ export const useAuthStore = () => {
         user,
 
         // Métodos
-        starLogin
+        startLogin,
+        startRegister,
+        checkAuthToken,
+        startLogout
     }
 }
 

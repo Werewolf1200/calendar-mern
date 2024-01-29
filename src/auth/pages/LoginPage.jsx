@@ -18,7 +18,7 @@ const registerFormFields = {
 
 export const LoginPage = () => {
 
-    const { starLogin, errorMessage } = useAuthStore();
+    const { startLogin, errorMessage, startRegister } = useAuthStore();
 
     const { loginEmail, loginPassword, onInputChange: onLoginInputChange } = useForm(loginFormFields)
 
@@ -26,12 +26,18 @@ export const LoginPage = () => {
     
     const loginSubmit = (event) => {
         event.preventDefault();
-        starLogin({ email: loginEmail, password: loginPassword})
+        startLogin({ email: loginEmail, password: loginPassword})
     }
 
     const registerSubmit = (event) => {
         event.preventDefault();
-        console.log({registerName, registerEmail, registerPassword, registerPassword2})
+        
+        if (registerPassword !== registerPassword2) {
+            Swal.fire('Error en registro', 'Contraseñas no coinciden', 'error');
+            return;
+        }
+
+        startRegister({ name: registerName, email: registerEmail, password: registerPassword });
     }
 
     useEffect(() => {
