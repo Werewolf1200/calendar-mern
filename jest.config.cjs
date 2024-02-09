@@ -4,6 +4,6 @@ module.exports = {
     transformIgnorePatterns: [],
     
     // ModuleNameMapper sólo si ocupamos importar CSS en nuestros componentes para el testing
-    //// '\\.(css|less)$': '<rootDir>/tests/mocks/styleMock.js',
-    //}
+    moduleNameMapper: {'\\.(css|less)$': '<rootDir>/tests/mocks/styleMock.js',
+    }
 }
